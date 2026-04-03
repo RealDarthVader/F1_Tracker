@@ -1,7 +1,17 @@
 from fastapi import FastAPI, HTTPException
-
+from pydantic import BaseModel
 app = FastAPI()
+class Driver(BaseModel):
+    name: str
+    team: str
+    number: int
+    nationality: str
 
+class Race(BaseModel):
+    name: str
+    season: int
+    round: int
+    circuit: str
 
 @app.get("/health")
 def health_check():
@@ -47,3 +57,6 @@ def get_driver(driver_id: int):
         if driver["id"] == driver_id:
             return driver
     raise HTTPException(status_code=404, detail="Driver not found")
+@app.post("/drivers", status_code=201)
+def create_driver(driver: Driver):
+    return {"message": "Driver created", "driver": driver}
