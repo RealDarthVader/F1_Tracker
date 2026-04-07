@@ -1,5 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from typing import Optional
+
+
 app = FastAPI()
 class Driver(BaseModel):
     name: str
@@ -12,7 +15,11 @@ class Race(BaseModel):
     season: int
     round: int
     circuit: str
-
+class Driver(BaseModel):
+    name: str
+    team: str
+    number: int
+    nationality: Optional[str] = None
 @app.get("/health")
 def health_check():
     return {"status": "ok", "project": "F1 Tracker"}
@@ -45,7 +52,17 @@ def get_drivers():
         {"id": 2, "name": "Lewis Hamilton", "team": "Ferrari", "number": 44},
         {"id": 3, "name": "Lando Norris", "team": "McLaren", "number": 4},
     ]
-
+@app.get("/drivers/{driver_id}", response_model=Driver)
+def get_driver(driver_id: int):
+    drivers = [
+        {"id": 1, "name": "Max Verstappen", "team": "Red Bull", "number": 1, "nationality": "Dutch"},
+        {"id": 2, "name": "Lewis Hamilton", "team": "Ferrari", "number": 44, "nationality": "British"},
+        {"id": 3, "name": "Lando Norris", "team": "McLaren", "number": 4, "nationality": "British"},
+    ]
+    for driver in drivers:
+        if driver["id"] == driver_id:
+            return driver
+    raise HTTPException(status_code=404, detail="Driver not found")
 @app.get("/drivers/{driver_id}")
 def get_driver(driver_id: int):
     drivers = [
